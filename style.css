@@ -6,7 +6,7 @@
   --color-activity--5: #ffda79;
   --color-activity--6: #ff793f;
 
-  --color-dark--1: #2d3439;
+  --color-dark--1: #596275;
   --color-dark--2: #42484d;
   --color-light--1: #aaa;
   --color-light--2: #ececec;
@@ -38,12 +38,6 @@ body {
   padding: 2.5rem;
 
   display: flex;
-}
-
-/* GENERAL */
-a:link,
-a:visited {
-  color: var(--color-brand--1);
 }
 
 /* SIDEBAR */
@@ -193,24 +187,6 @@ a:visited {
 
 .form__btn {
   display: none;
-}
-
-.copyright {
-  margin-top: auto;
-  font-size: 1.3rem;
-  text-align: center;
-  color: var(--color-light--1);
-}
-
-.twitter-link:link,
-.twitter-link:visited {
-  color: var(--color-light--1);
-  transition: all 0.2s;
-}
-
-.twitter-link:hover,
-.twitter-link:active {
-  color: var(--color-light--2);
 }
 
 /* MAP */
