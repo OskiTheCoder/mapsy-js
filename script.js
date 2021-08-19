@@ -1,8 +1,5 @@
 'use strict';
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 const form = document.querySelector('.form');
 const containerActivities = document.querySelector('.activites');
 const inputType = document.querySelector('.form__input--type');
@@ -43,11 +40,10 @@ class Activity {
 class Biking extends Activity {
   type = 'biking';
 
-  constructor(coords, distance, duration, rating) {
+  constructor(coords, distance, duration) {
     super(coords);
     this.distance = distance;
     this.duration = duration;
-    this.rating = rating;
     this._setDescription();
   }
 
@@ -59,11 +55,10 @@ class Biking extends Activity {
 class Hiking extends Activity {
   type = 'hiking';
 
-  constructor(coords, distance, duration, rating) {
+  constructor(coords, distance, duration) {
     super(coords);
     this.distance = distance;
     this.duration = duration;
-    this.rating = rating;
     this._setDescription();
   }
 
@@ -187,12 +182,11 @@ class App {
     if (type == 'biking' || type == 'hiking') {
       distance = +inputDistance.value;
       duration = +inputDuration.value;
-      rating = +inputRating.value;
-      if (!checkInputs(distance, duration, rating)) return;
+      if (!checkInputs(distance, duration)) return;
       activity =
         type == 'biking'
-          ? new Biking([lat, lng], distance, duration, rating)
-          : new Hiking([lat, lng], distance, duration, rating);
+          ? new Biking([lat, lng], distance, duration)
+          : new Hiking([lat, lng], distance, duration);
     } else if (type == 'landmark') {
       name = inputName.value;
       rating = +inputRating.value;
@@ -250,9 +244,7 @@ class App {
         ${this._getPrimaryActivityValue(activity)}
       </div>
       <div class="activity__details">
-        <span class="activity__icon">⏱</span>
-        <span class="activity__value">${activity.duration}</span>
-        <span class="activity__unit">min</span>
+      ${this._getSecondaryActivityValue(activity)}
       </div>
   `;
 
@@ -265,13 +257,34 @@ class App {
     } else if (type == 'hiking') {
       return '🏔';
     } else if (type == 'landmark') {
-      return '🏰';
+      return '🏯';
     } else if (type == 'picnic') {
       return '🧺';
     } else if (type == 'views') {
       return '🌁';
     } else if (type == 'wildlife') {
       return '🐯';
+    }
+  }
+
+  _getSecondaryActivityValue(activity) {
+    if (
+      activity.type == 'wildlife' ||
+      activity.type == 'views' ||
+      activity.type == 'picnic'
+    ) {
+      return ``;
+    } else if (activity.type == 'landmark') {
+      return `
+      <span class="activity__value">${this._getStarCount(
+        activity.rating
+      )}</span>
+      <span class="activity__unit">rating</span>
+      `;
+    } else {
+      return `<span class="activity__icon">⏱</span>
+      <span class="activity__value">${activity.duration}</span>
+      <span class="activity__unit">min</span>`;
     }
   }
 
@@ -284,7 +297,7 @@ class App {
       <span class="activity__unit">name</span>`;
     } else if (activity.type == 'picnic' || activity.type == 'views') {
       return `<span class="activity__value">${this._getStarCount(
-        activity
+        activity.rating
       )}</span>
       <span class="activity__unit">rating</span>`;
     } else if (activity.type == 'wildlife') {
@@ -297,7 +310,6 @@ class App {
     if (optionValue == 'biking' || optionValue == 'hiking') {
       distanceRow.classList.toggle('form__row--hidden');
       durationRow.classList.toggle('form__row--hidden');
-      ratingRow.classList.toggle('form__row--hidden');
     } else if (optionValue == 'landmark') {
       nameRow.classList.toggle('form__row--hidden');
       ratingRow.classList.toggle('form__row--hidden');
@@ -309,24 +321,24 @@ class App {
   }
 
   _getStarCount(rating) {
-    const ratingAbs = Math.abs(rating);
-    let stars = '⭐️⭐️⭐️⭐️⭐️';
-    if (ratingAbs >= 5) {
-      return stars;
+    if (rating <= 1) {
+      return '❌';
     }
-    if (ratingAbs >= 4) {
-      return stars.slice(1);
+    if (rating >= 5) {
+      return '⭐️⭐️⭐️⭐️⭐️';
     }
-    if (ratingAbs >= 3) {
-      return stars.slice(2);
+    if (rating >= 4) {
+      return '⭐️⭐️⭐️⭐️';
     }
-    if (ratingAbs >= 2) {
-      return stars.slice(3);
+    if (rating >= 3) {
+      return '⭐️⭐️⭐️';
     }
-    if (ratingAbs >= 1) {
-      stars.slice(4);
+    if (rating >= 2) {
+      return '⭐️⭐️';
     }
-    return '❌';
+    if (rating >= 1) {
+      return '⭐️';
+    }
   }
 }
 
