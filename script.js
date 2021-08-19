@@ -4,7 +4,7 @@
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 const form = document.querySelector('.form');
-const containerWorkouts = document.querySelector('.workouts');
+const containerActivities = document.querySelector('.activites');
 const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
@@ -50,6 +50,10 @@ class Biking extends Activity {
     this.rating = rating;
     this._setDescription();
   }
+
+  calcSpeed() {
+    return this.duration / this.distance;
+  }
 }
 
 class Hiking extends Activity {
@@ -61,6 +65,10 @@ class Hiking extends Activity {
     this.duration = duration;
     this.rating = rating;
     this._setDescription();
+  }
+
+  calcSpeed() {
+    return this.duration / this.distance;
   }
 }
 
@@ -108,6 +116,7 @@ class Wildlife extends Activity {
 class App {
   #map;
   #mapEvent;
+  #activities = [];
   #currentRow = 'biking';
 
   constructor() {
@@ -156,15 +165,66 @@ class App {
   }
 
   _newActivity(e) {
+    const checkInputs = (...inputs) => {
+      if (!inputs.every(inp => Number.isFinite(inp))) {
+        alert('Oops inputs must be valid numbers');
+        return false;
+      }
+      return true;
+    };
     e.preventDefault();
+
+    //get data from form, check validty create object, add new object to activity array
+    const type = inputType.value;
+    const { lat, lng } = this.#mapEvent.latlng;
+    let distance;
+    let duration;
+    let rating;
+    let name;
+    let species;
+    let activity;
+
+    if (type == 'biking' || type == 'hiking') {
+      distance = +inputDistance.value;
+      duration = +inputDuration.value;
+      rating = +inputRating.value;
+      if (!checkInputs(distance, duration, rating)) return;
+      activity =
+        type == 'biking'
+          ? new Biking([lat, lng], distance, duration, rating)
+          : new Hiking([lat, lng], distance, duration, rating);
+    } else if (type == 'landmark') {
+      name = inputName.value;
+      rating = +inputRating.value;
+      if (!checkInputs(rating)) return;
+      activity = new Landmark([lat, lng], name, rating);
+    } else if (type == 'picnic' || type == 'views') {
+      rating = +inputRating.value;
+      if (!checkInputs(rating)) return;
+      activity =
+        type == 'picnic'
+          ? new Picnic([lat, lng], rating)
+          : new Views([lat, lng], rating);
+    } else if (type == 'wildlife') {
+      species = inputSpecies.value;
+      activity = new Wildlife([lat, lng], species);
+    }
+    //add activity
+    console.log(activity);
+    this.#activities.push(activity);
+
     inputDistance.value = '';
     inputDuration.value = '';
     inputName.value = '';
     inputRating.value = '';
     inputSpecies.value = '';
     //add marker to map
-    const { lat, lng } = this.#mapEvent.latlng;
-    L.marker([lat, lng])
+    this._renderActivityMarker(activity);
+    this._renderActivity(activity);
+  }
+
+  _renderActivityMarker(activity) {
+    L.marker(activity.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -172,11 +232,65 @@ class App {
           minWidth: 250,
           autoClose: false,
           closeOnClick: false,
-          className: 'running-popup',
+          className: `${activity.type}-popup`,
         })
       )
-      .setPopupContent('buttercup tofu nico problematic white people')
+      .setPopupContent('buttercup')
       .openPopup();
+  }
+
+  _renderActivity(activity) {
+    let html = `
+    <li class="activity activity--${activity.type}" data-id="${activity.id}">
+      <h2 class="activity__title">${activity.description}</h2>
+      <div class="activity__details">
+        <span class="activity__icon">${this._getActivityEmoji(
+          activity.type
+        )}</span>
+        ${this._getPrimaryActivityValue(activity)}
+      </div>
+      <div class="activity__details">
+        <span class="activity__icon">⏱</span>
+        <span class="activity__value">${activity.duration}</span>
+        <span class="activity__unit">min</span>
+      </div>
+  `;
+
+    form.insertAdjacentHTML('afterend', html);
+  }
+
+  _getActivityEmoji(type) {
+    if (type == 'biking') {
+      return '🚴';
+    } else if (type == 'hiking') {
+      return '🏔';
+    } else if (type == 'landmark') {
+      return '🏰';
+    } else if (type == 'picnic') {
+      return '🧺';
+    } else if (type == 'views') {
+      return '🌁';
+    } else if (type == 'wildlife') {
+      return '🐯';
+    }
+  }
+
+  _getPrimaryActivityValue(activity) {
+    if (activity.type == 'biking' || activity.type == 'hiking') {
+      return `<span class="activity__value">${activity.distance}</span>
+      <span class="activity__unit">km</span>`;
+    } else if (activity.type == 'landmark') {
+      return `<span class="activity__value">${activity.name}</span>
+      <span class="activity__unit">name</span>`;
+    } else if (activity.type == 'picnic' || activity.type == 'views') {
+      return `<span class="activity__value">${this._getStarCount(
+        activity
+      )}</span>
+      <span class="activity__unit">rating</span>`;
+    } else if (activity.type == 'wildlife') {
+      return `<span class="activity__value">${activity.species}</span>
+      <span class="activity__unit">species</span>`;
+    }
   }
 
   _toggleInputs(optionValue) {
@@ -192,6 +306,27 @@ class App {
     } else {
       speciesRow.classList.toggle('form__row--hidden');
     }
+  }
+
+  _getStarCount(rating) {
+    const ratingAbs = Math.abs(rating);
+    let stars = '⭐️⭐️⭐️⭐️⭐️';
+    if (ratingAbs >= 5) {
+      return stars;
+    }
+    if (ratingAbs >= 4) {
+      return stars.slice(1);
+    }
+    if (ratingAbs >= 3) {
+      return stars.slice(2);
+    }
+    if (ratingAbs >= 2) {
+      return stars.slice(3);
+    }
+    if (ratingAbs >= 1) {
+      stars.slice(4);
+    }
+    return '❌';
   }
 }
 

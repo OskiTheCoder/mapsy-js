@@ -2,6 +2,13 @@
   --color-brand--1: #ffb545;
   --color-brand--2: #00c46a;
 
+  --color-activity--1: #33d9b2;
+  --color-activity--2: #34ace0;
+  --color-activity--3: #706fd3;
+  --color-activity--4: #ff5252;
+  --color-activity--5: #ffda79;
+  --color-activity--6: #ff793f;
+
   --color-dark--1: #2d3439;
   --color-dark--2: #42484d;
   --color-light--1: #aaa;
@@ -58,18 +65,18 @@ a:visited {
   margin-bottom: 4rem;
 }
 
-.workouts {
+.activities {
   list-style: none;
   height: 77vh;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
-.workouts::-webkit-scrollbar {
+.activities::-webkit-scrollbar {
   width: 0;
 }
 
-.workout {
+.activity {
   background-color: var(--color-dark--2);
   border-radius: 5px;
   padding: 1.5rem 2.25rem;
@@ -80,36 +87,53 @@ a:visited {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 0.75rem 1.5rem;
 }
-.workout--running {
-  border-left: 5px solid var(--color-brand--2);
-}
-.workout--cycling {
-  border-left: 5px solid var(--color-brand--1);
+.activity--biking {
+  border-left: 5px solid var(--color-activity--1);
 }
 
-.workout__title {
+.activity--hiking {
+  border-left: 5px solid var(--color-activity--2);
+}
+
+.activity--landmark {
+  border-left: 5px solid var(--color-activity--3);
+}
+
+.activity--picnic {
+  border-left: 5px solid var(--color-activity--4);
+}
+
+.activity--views {
+  border-left: 5px solid var(--color-activity--5);
+}
+
+.activity--wildlife {
+  border-left: 5px solid var(--color-activity--6);
+}
+
+.activity__title {
   font-size: 1.7rem;
   font-weight: 600;
   grid-column: 1 / -1;
 }
 
-.workout__details {
+.activity__details {
   display: flex;
   align-items: baseline;
 }
 
-.workout__icon {
+.activity__icon {
   font-size: 1.8rem;
   margin-right: 0.2rem;
   height: 0.28rem;
 }
 
-.workout__value {
+.activity__value {
   font-size: 1.5rem;
   margin-right: 0.5rem;
 }
 
-.workout__unit {
+.activity__unit {
   font-size: 1.1rem;
   color: var(--color-light--1);
   text-transform: uppercase;
@@ -215,9 +239,21 @@ a:visited {
   background-color: var(--color-dark--1);
 }
 
-.running-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid var(--color-brand--2);
+.biking-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-activity--1);
 }
-.cycling-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid var(--color-brand--1);
+.hiking-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-activity--2);
+}
+.landmark-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-activity--3);
+}
+.picnic-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-activity--4);
+}
+.views-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-activity--5);
+}
+.wildlife-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-activity--6);
 }
